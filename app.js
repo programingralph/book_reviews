@@ -14,13 +14,13 @@ const db = new pg.Client({
     host: "localhost",
     database: "Books",
     password: process.env.PASSWORD,
-    port: 5432,
+    port: 5433,
 });
 db.connect(); 
 
 app.get("/", async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM reviews ORDER BY id ASC')
+        const result = await db.query('SELECT * FROM reviews ORDER BY book_id ASC')
         res.render("index.ejs", {reviews : result.rows});
         // console.log(result.rows);
     } catch (err) {

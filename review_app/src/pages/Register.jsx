@@ -1,22 +1,29 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function Login() {
+export default function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    setIsLoading(true);
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch('http://localhost:3000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,13 +34,14 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful:', data);
+        console.log('Registration successful:', data);
         if (data.token) {
           localStorage.setItem('token', data.token);
         }
-        setSuccess('Login successful! Redirecting...');
+        setSuccess('Registration successful! Redirecting...');
         setUsername('');
         setPassword('');
+        setConfirmPassword('');
         setTimeout(() => {
           if (!data.user_id) {
             throw new Error('No user ID returned from server');
@@ -41,11 +49,11 @@ export default function Login() {
           navigate(`/user/${data.user_id}`);
         }, 2000);
       } else {
-        setError(data.error || 'Login failed. Please try again.');
+        setError(data.error || 'Registration failed. Please try again.');
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('Something went wrong. Please try again.');
+      console.error('Error during registration:', error);
+      setError('Something went wrong. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -64,14 +72,14 @@ export default function Login() {
         >
           Go back
         </button>
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Register</h2>
         {error && (
           <p className="text-red-500 text-center mb-4 p-2 bg-red-100 rounded-md">{error}</p>
         )}
         {success && (
           <p className="text-green-500 text-center mb-4 p-2 bg-green-100 rounded-md">{success}</p>
         )}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleRegister} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
               Username
@@ -79,7 +87,7 @@ export default function Login() {
             <input
               id="username"
               type="text"
-              placeholder="Enter your username"
+              placeholder="Choose a username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -94,9 +102,24 @@ export default function Login() {
             <input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Choose a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               required
               disabled={isLoading}
@@ -108,18 +131,18 @@ export default function Login() {
               className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
-              {isLoading ? 'Verifying...' : 'Login'}
+              {isLoading ? 'Registering...' : 'Register'}
             </button>
           </div>
         </form>
         <div className="text-center mt-4">
           <p>
-            Don't have an account?{' '}
+            Already have an account?{' '}
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/login')}
               className="text-green-600 hover:underline"
             >
-              Register
+              Log in
             </button>
           </p>
         </div>

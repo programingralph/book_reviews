@@ -4,7 +4,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from 'react-router-dom';
-import { Home, Login, SignUp, Reviews, WriteReview } from './pages/index';
+import { Home, Login, Register, Reviews, WriteReview } from './pages/index';
 // import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'; // Your shared layout component
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'login', element: <Login /> },
-      { path: 'signup', element: <SignUp /> },
+      { path: 'Register', element: <Register /> },
       { path: 'reviews', element: <Reviews /> },
       { path: 'writereview', element: <WriteReview /> },
     ],

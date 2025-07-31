@@ -10,7 +10,7 @@ function Navbar() {
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   return (
-    <header className={`px-6 py-4 flex items-center justify-between ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white shadow-md text-black'}`}>
+    <header className={`px-6 py-4 flex items-center justify-between ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-teal-950 shadow-md text-yellow-500'}`}>
       {/* Left: Logo or Menu Toggle */}
       <div className="flex items-center space-x-4">
         <button onClick={toggleMobileMenu} className="md:hidden text-xl">
@@ -43,7 +43,7 @@ function Navbar() {
           <FaSignInAlt />
           <span>Sign In</span>
         </Link>
-        <Link to="/signup" className="flex items-center space-x-1 hover:underline">
+        <Link to="/register" className="flex items-center space-x-1 hover:underline">
           <FaUserPlus />
           <span>Sign Up</span>
         </Link>

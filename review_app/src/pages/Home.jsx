@@ -5,7 +5,7 @@ const Home = () => {
     return (
         <div className="bg-black">
             <Navbar/>
-            <h1 className="text-red-500">This is the Home page</h1>
+            <h1 className="text-red-500">Search bar For display purpose only please register or login in order to use</h1>
             <BookReview/>
         </div>
     )

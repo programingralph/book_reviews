@@ -1,15 +1,23 @@
 import React from 'react';
 import Ratings from "./Ratings";
+import { useNavigate } from "react-router-dom";
 
 const BookReview = () => {
-  const ISNB = "9798395421142"
+  const ISBN = "9798395421142"
+  const navigate = useNavigate();
+
+  const handleAddReview = (event) => {
+    event.preventDefault(); // Prevent native form submission
+    navigate('/writereview');
+  };
   return (
     <div className="p-6 max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-md shadow-md">
-      <form action="/add" method="POST" className="mb-4">
+      <form action="/writereview" method="GET" className="mb-4">
         <button
           type="submit"
           name="newReview"
           className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
+          onClick={handleAddReview}
         >
           Add Review
         </button>
@@ -20,8 +28,8 @@ const BookReview = () => {
 
       <article className="flex flex-col md:flex-row gap-6 items-start">
         <img
-          src={`https://covers.openlibrary.org/b/isbn/${ISNB}-M.jpg`}
-          alt={`Book Cover for ISBN ${ISNB}`}
+          src={`https://covers.openlibrary.org/b/isbn/${ISBN}-M.jpg`}
+          alt={`Book Cover for ISBN ${ISBN}`}
           className="w-[200px] rounded border shadow"
         />
         <div className="flex-1 space-y-2">

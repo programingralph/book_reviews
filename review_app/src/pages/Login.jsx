@@ -112,7 +112,7 @@ export default function Login() {
             </button>
           </div>
         </form>
-        <div className="text-center mt-4">
+        <div className="text-green-300 text-center mt-4">
           <p>
             Don't have an account?{' '}
             <button

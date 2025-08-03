@@ -1,13 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from 'react-router-dom';
-import { Home, Login, Register, Reviews, WriteReview } from './pages/index';
-// import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App'; // Your shared layout component
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { Home, Login, Register, WriteReview, ActiveUser } from './pages';
+import { ProtectedRoute } from './components';
+import './index.css';
+import App from './App';
 
 const router = createBrowserRouter([
   {
@@ -17,13 +14,13 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
-      { path: 'reviews', element: <Reviews /> },
       { path: 'writereview', element: <WriteReview /> },
+      { path: '/user/:id', element: <ProtectedRoute><ActiveUser /></ProtectedRoute> },
+      { path: '*', element: <div className="text-center text-red-500 mt-20">404: Page Not Found</div> },
     ],
   },
 ]);
 
-// Render the RouterProvider and inject the router
 const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

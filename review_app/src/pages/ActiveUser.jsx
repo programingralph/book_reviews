@@ -1,23 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Ratings } from '../components';
+import { getReviews, postReview, updateReview, deleteReview } from '../services/api';
 
-export default function WriteReview() {
+export default function ActiveUser() {
   const navigate = useNavigate();
-  const [reviews, setReviews] = useState([
-    {
-      review_id: 1,
-      title: 'The Richest Man In Babylon',
-      author: 'George A. Clason',
-      description:
-        'This book teaches the reader about the importance of financial literacy. It provides a simple yet interesting story about financial habits that have been proven to stand the test of time.',
-      opinion:
-        'A must-read for those in need of a direct explanation on how to achieve financial freedom.',
-      isbn: '9798395421142',
-      rating: 5,
-      review_date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD
-    },
-  ]);
+  const [reviews, setReviews] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -39,6 +27,28 @@ export default function WriteReview() {
   });
   const [failedImages, setFailedImages] = useState({});
   const [editId, setEditId] = useState(null);
+  const [apiError, setApiError] = useState('');
+  const user_id = parseInt(localStorage.getItem('id'));
+
+  useEffect(() => {
+    if (!user_id || !localStorage.getItem('token')) {
+      navigate('/login');
+    }
+  }, [user_id, navigate]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const data = await getReviews(user_id);
+        setReviews(data);
+        setApiError('');
+      } catch (err) {
+        setApiError(err);
+        console.error('Fetch reviews error:', err); // Debug log
+      }
+    };
+    if (user_id) fetchReviews();
+  }, [user_id]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -51,6 +61,7 @@ export default function WriteReview() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
+    setApiError('');
   };
 
   const handleRatingChange = (e) => {
@@ -61,7 +72,7 @@ export default function WriteReview() {
     }
   };
 
-  const handleAddOrUpdateReview = () => {
+  const handleAddOrUpdateReview = async () => {
     const newErrors = {
       title: !formData.title ? 'Title is required' : '',
       author: !formData.author ? 'Author is required' : '',
@@ -75,45 +86,56 @@ export default function WriteReview() {
       return;
     }
 
-    if (editId !== null) {
-      setReviews((prev) =>
-        prev.map((review) =>
-          review.review_id === editId ? { ...formData, review_id: editId } : review
-        )
-      );
-      setEditId(null);
-    } else {
-      const newReview = {
-        ...formData,
-        review_id: reviews.length > 0 ? Math.max(...reviews.map((r) => r.review_id)) + 1 : 1,
-      };
-      setReviews((prev) => [...prev, newReview]);
+    try {
+      if (editId !== null) {
+        const updatedReview = await updateReview(editId, formData);
+        setReviews((prev) =>
+          prev.map((review) =>
+            review.review_id === editId ? updatedReview : review
+          )
+        );
+        setEditId(null);
+      } else {
+        const newReview = await postReview(user_id, formData);
+        setReviews((prev) => [...prev, newReview]);
+      }
+      setFormData({
+        title: '',
+        author: '',
+        description: '',
+        opinion: '',
+        isbn: '',
+        rating: 3,
+        review_date: '',
+      });
+      setErrors({
+        title: '',
+        author: '',
+        description: '',
+        opinion: '',
+        review_date: '',
+      });
+      setApiError('');
+    } catch (err) {
+      setApiError(err);
+      console.error('Review submission error:', err); // Debug log
     }
-    setFormData({
-      title: '',
-      author: '',
-      description: '',
-      opinion: '',
-      isbn: '',
-      rating: 3,
-      review_date: '',
-    });
-    setErrors({
-      title: '',
-      author: '',
-      description: '',
-      opinion: '',
-      review_date: '',
-    });
   };
 
-  const handleDeleteReview = (review_id) => {
-    setReviews((prev) => prev.filter((review) => review.review_id !== review_id));
-    setFailedImages((prev) => {
-      const newFailedImages = { ...prev };
-      delete newFailedImages[review_id];
-      return newFailedImages;
-    });
+  const handleDeleteReview = async (review_id) => {
+    try {
+      await deleteReview(review_id);
+      setReviews((prev) => prev.filter((review) => review.review_id !== review_id));
+      setFailedImages((prev) => {
+        const newFailedImages = { ...prev };
+        delete newFailedImages[review_id];
+        return newFailedImages;
+      });
+      setApiError('');
+    } catch (err) {
+      setApiError(err);
+      console.error('Delete review error:', err); // Debug log
+    }
   };
 
   const handleEditReview = (review) => {
@@ -128,6 +150,7 @@ export default function WriteReview() {
     });
     setEditId(review.review_id);
     setShowForm(true);
+    setApiError('');
   };
 
   const handleCancelEdit = () => {
@@ -148,10 +171,13 @@ export default function WriteReview() {
       opinion: '',
       review_date: '',
     });
+    setApiError('');
   };
 
-  const handleLogin = () => {
-    navigate('/login');
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('id');
+    navigate('/');
   };
 
   const handleImageError = (review_id) => {
@@ -181,13 +207,15 @@ export default function WriteReview() {
           className="input input-bordered w-1/2"
         />
         <button
-          onClick={handleLogin}
-          className="btn btn-outline btn-primary ml-4"
+          onClick={handleLogout}
+          className="btn btn-outline btn-error ml-4"
         >
-          Log In
+          Logout
         </button>
       </nav>
-      <h1 className="text-red-500">For demo purpose only please register or login if you want to save reviews before submiting</h1>
+      {apiError && (
+        <div className="text-center text-red-500 mt-4">{apiError}</div>
+      )}
       <div className="text-center mt-6">
         <button
           onClick={() => setShowForm((prev) => !prev)}

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../services/api';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -16,36 +17,25 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Login successful:', data);
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-        setSuccess('Login successful! Redirecting...');
-        setUsername('');
-        setPassword('');
-        setTimeout(() => {
-          if (!data.user_id) {
-            throw new Error('No user ID returned from server');
-          }
-          navigate(`/user/${data.user_id}`);
-        }, 2000);
-      } else {
-        setError(data.error || 'Login failed. Please try again.');
+      const response = await login(email, password);
+      console.log('Login response:', response); // Debug log
+      const { id, token } = response;
+      if (!id) {
+        throw new Error('No user ID returned from server');
       }
+      localStorage.clear(); // Clear stale data
+      localStorage.setItem('token', token);
+      localStorage.setItem('id', id);
+      setSuccess('Login successful! Redirecting...');
+      setEmail('');
+      setPassword('');
+      setTimeout(() => {
+        console.log('Navigating to:', `/user/${id}`); // Debug log
+        navigate(`/user/${id}`);
+      }, 2000);
     } catch (error) {
       console.error('Login error:', error);
-      setError('Something went wrong. Please try again.');
+      setError(error.message || error);
     } finally {
       setIsLoading(false);
     }
@@ -73,15 +63,15 @@ export default function Login() {
         )}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
             </label>
             <input
-              id="username"
-              type="text"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               required
               disabled={isLoading}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Ratings } from '../components';
 import { getReviews, postReview, updateReview, deleteReview } from '../services/api';
+import ActiveUserNavbar from '../components/ActiveUserNavbar';
 
 export default function ActiveUser() {
   const navigate = useNavigate();
@@ -43,8 +44,8 @@ export default function ActiveUser() {
         setReviews(data);
         setApiError('');
       } catch (err) {
-        setApiError(err);
-        console.error('Fetch reviews error:', err); // Debug log
+        setApiError(err.message || 'Failed to fetch reviews');
+        console.error('Fetch reviews error:', err);
       }
     };
     if (user_id) fetchReviews();
@@ -117,8 +118,8 @@ export default function ActiveUser() {
       });
       setApiError('');
     } catch (err) {
-      setApiError(err);
-      console.error('Review submission error:', err); // Debug log
+      setApiError(err.message || 'Failed to submit review');
+      console.error('Review submission error:', err);
     }
   };
 
@@ -133,8 +134,8 @@ export default function ActiveUser() {
       });
       setApiError('');
     } catch (err) {
-      setApiError(err);
-      console.error('Delete review error:', err); // Debug log
+      setApiError(err.message || 'Failed to delete review');
+      console.error('Delete review error:', err);
     }
   };
 
@@ -174,12 +175,6 @@ export default function ActiveUser() {
     setApiError('');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('id');
-    navigate('/');
-  };
-
   const handleImageError = (review_id) => {
     setFailedImages((prev) => ({ ...prev, [review_id]: true }));
   };
@@ -198,21 +193,7 @@ export default function ActiveUser() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-teal-800 dark:text-teal-400">
-      <nav className="flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 shadow">
-        <input
-          type="text"
-          placeholder="Search by title or author..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="input input-bordered w-1/2"
-        />
-        <button
-          onClick={handleLogout}
-          className="btn btn-outline btn-error ml-4"
-        >
-          Logout
-        </button>
-      </nav>
+      <ActiveUserNavbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {apiError && (
         <div className="text-center text-red-500 mt-4">{apiError}</div>
       )}

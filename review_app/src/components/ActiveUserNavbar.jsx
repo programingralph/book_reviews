@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { FaSignInAlt, FaUserPlus, FaSearch, FaMoon, FaSun, FaBars, FaTimes } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaSearch, FaMoon, FaSun, FaBars, FaTimes } from 'react-icons/fa';
 
-function Navbar() {
+function ActiveUserNavbar({ searchTerm, setSearchTerm }) {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const mobileMenuRef = useRef(null);
 
-  // Toggle mobile menu
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
-  // Toggle theme and apply to document
   const toggleTheme = () => {
     setIsDarkMode((prev) => {
       const newMode = !prev;
@@ -19,7 +18,13 @@ function Navbar() {
     });
   };
 
-  // Close mobile menu when clicking outside
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('id');
+    navigate('/');
+    setIsMobileMenuOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
@@ -36,7 +41,7 @@ function Navbar() {
         isDarkMode ? 'bg-gray-900 text-white' : 'bg-teal-950 text-yellow-500'
       } shadow-md transition-all duration-300`}
     >
-      {/* Left: Logo or Menu Toggle */}
+      {/* Left: Menu Toggle and Theme Toggle */}
       <div className="flex items-center space-x-3 sm:space-x-4">
         <button
           onClick={toggleMobileMenu}
@@ -60,7 +65,9 @@ function Navbar() {
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
           <input
             type="text"
-            placeholder="Search reviews..."
+            placeholder="Search by title or author..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full pl-10 pr-4 py-2 border rounded focus:outline-none transition-all duration-300 ${
               isDarkMode
                 ? 'bg-gray-800 text-white border-gray-600 focus:ring-2 focus:ring-blue-300'
@@ -70,22 +77,14 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Right: Auth Links */}
+      {/* Right: Logout Button */}
       <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
-        <Link
-          to="/login"
-          className="flex items-center space-x-1 hover:underline focus:outline-none"
+        <button
+          onClick={handleLogout}
+          className="flex items-center space-x-1 hover:underline focus:outline-none px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
         >
-          <FaSignInAlt />
-          <span>Sign In</span>
-        </Link>
-        <Link
-          to="/register"
-          className="flex items-center space-x-1 hover:underline focus:outline-none"
-        >
-          <FaUserPlus />
-          <span>Sign Up</span>
-        </Link>
+          <span>Logout</span>
+        </button>
       </div>
 
       {/* Mobile Menu */}
@@ -109,27 +108,19 @@ function Navbar() {
               </button>
             </div>
             <div className="flex flex-col space-y-4 mt-4">
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <button
+                onClick={handleLogout}
                 className="flex items-center space-x-2 hover:underline"
               >
-                <FaSignInAlt />
-                <span>Sign In</span>
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center space-x-2 hover:underline"
-              >
-                <FaUserPlus />
-                <span>Sign Up</span>
-              </Link>
+                <span>Logout</span>
+              </button>
               <div className="relative">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                 <input
                   type="text"
-                  placeholder="Search reviews..."
+                  placeholder="Search by title or author..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className={`w-full pl-10 pr-4 py-2 rounded border ${
                     isDarkMode
                       ? 'bg-gray-700 text-white border-gray-600 focus:ring-2 focus:ring-blue-300'
@@ -145,4 +136,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default ActiveUserNavbar;

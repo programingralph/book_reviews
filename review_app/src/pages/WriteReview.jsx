@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Ratings } from '../components';
+import WriteReviewNavbar from '../components/WriteReviewNavbar';
 
 export default function WriteReview() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function WriteReview() {
         'A must-read for those in need of a direct explanation on how to achieve financial freedom.',
       isbn: '9798395421142',
       rating: 5,
-      review_date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD
+      review_date: new Date().toISOString().split('T')[0],
     },
   ]);
   const [formData, setFormData] = useState({
@@ -150,10 +151,6 @@ export default function WriteReview() {
     });
   };
 
-  const handleLogin = () => {
-    navigate('/login');
-  };
-
   const handleImageError = (review_id) => {
     setFailedImages((prev) => ({ ...prev, [review_id]: true }));
   };
@@ -172,22 +169,10 @@ export default function WriteReview() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-teal-800 dark:text-teal-400">
-      <nav className="flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 shadow">
-        <input
-          type="text"
-          placeholder="Search by title or author..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="input input-bordered w-1/2"
-        />
-        <button
-          onClick={handleLogin}
-          className="btn btn-outline btn-primary ml-4"
-        >
-          Log In
-        </button>
-      </nav>
-      <h1 className="text-red-500">For demo purpose only please register or login if you want to save reviews before submiting</h1>
+      <WriteReviewNavbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <h1 className="text-red-500 text-center mt-4">
+        For demo purpose only, please register or login to save reviews
+      </h1>
       <div className="text-center mt-6">
         <button
           onClick={() => setShowForm((prev) => !prev)}

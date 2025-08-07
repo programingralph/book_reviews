@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "./NavBar";
+import Navbar from "./Navbar";
 import Ratings from "./Ratings";
 import Footer from "./Footer";
 import BookReview from "./BookReview";

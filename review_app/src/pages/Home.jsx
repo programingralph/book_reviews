@@ -1,11 +1,11 @@
 import React from 'react';
-import { Navbar, BookReview } from '../components';
+import { Navbar, BookReview, HomeNavbar } from '../components';
 
 const Home = () => {
   return (
     <div className="bg-black">
-      <Navbar />
-      <h1 className="text-red-500">Search bar for display purpose only please register or login in order to use. Click Add Review to see demo.</h1>
+      <HomeNavbar />
+      <h1 className="text-red-500">Click Add Review to see demo.</h1>
       <BookReview />
     </div>
   );

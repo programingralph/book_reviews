@@ -4,6 +4,7 @@ import Ratings from "./Ratings";
 import Footer from "./Footer";
 import BookReview from "./BookReview";
 import ProtectedRoute from "./ProtectedRoute";
+import HomeNavbar from "./HomeNavbar";
 
 
-export { Navbar, Ratings, Footer, BookReview, ProtectedRoute  };
+export { Navbar, Ratings, Footer, BookReview, ProtectedRoute, HomeNavbar  };
